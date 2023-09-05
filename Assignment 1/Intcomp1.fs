@@ -10,7 +10,7 @@ module Intcomp1
 type expr = 
   | CstI of int
   | Var of string
-  | Let of (string * expr) list * expr
+  | Let of (string * expr) list * expr // string * expr * expr
   | Prim of string * expr * expr;;
 
 (* Some closed expressions: *)
@@ -207,12 +207,13 @@ let rec minus (xs, ys) =
 
 (* Find all variables that occur free in expression e *)
 
+// exercse 2.2
 let rec freevars e : string list =
     match e with
     | CstI i -> []
     | Var x  -> [x]
-    | Let(x, erhs, ebody) -> 
-          union (freevars erhs, minus (freevars ebody, [x]))
+    | Let([x,xs], ebody) -> union (freevars xs, minus (freevars ebody, [x]))
+    | Let((x,_)::xs, ebody) ->  union (freevars xs, minus (freevars (Let (xs,ebody)), [x]))
     | Prim(ope, e1, e2) -> union (freevars e1, freevars e2);;
 
 (* Alternative definition of closed *)
