@@ -1,7 +1,7 @@
 (* Programming language concepts for software developers, 2010-08-28 *)
 
-// Done:1.1, 1.2
-// To do: PLC: 1.4, 2.1, 2.2, 2.3 (optionally also 2.6).
+// Done:1.1, 1.2, 1.4, 2.1, 2.2, 2.3
+// To do: PLC: (optionally also 2.6).
 
 (* Evaluating simple expressions with variables *)
 
@@ -37,7 +37,7 @@ let e3 = Prim("+", Prim("*", Var "b", CstI 9), Var "a")
 
 
 (* Evaluation within an environment *)
-//1.1.1
+// exercise 1.1.1
 let rec eval e (env: (string * int) list) : int =
     match e with
     | CstI i -> i
@@ -56,7 +56,7 @@ let rec eval e (env: (string * int) list) : int =
     | Prim("==", e1, e2) -> if (eval e1 env = eval e2 env) then 1 else 0
     | Prim _ -> failwith "unknown primitive"
 
-//1.1.2
+// exercise 1.1.2
 
 let e2v1 = eval e2 env
 let e2v2 = eval e2 [ ("a", 314) ]
@@ -66,7 +66,7 @@ let mye1 = Prim("*", CstI 2, CstI 0)
 
 let evaluate = eval mye1 env
 
-//1.1.3
+// exercise 1.1.3
 
 let rec eval2 e (env: (string * int) list) : int =
     match e with
@@ -99,7 +99,7 @@ type aexp =
 
 // Write the representation of the expressions
 
-// 1.2.2
+// exercise 1.2.2
 
 // v − (w + z)
 let w1 = Sub(Var "v", Add(Var "w", Var "z"))
@@ -121,7 +121,7 @@ let _ = (printf "%s \n" (fmt w1))
 let _ = (printf "%s \n" (fmt w2))
 let _ = (printf "%s \n" (fmt w3))
 
-// 1.2.4
+// exercise 1.2.4
 let rec simplify (e: aexp) =
     match e with
     | CstI x -> CstI x
@@ -153,7 +153,7 @@ let rec simplify (e: aexp) =
         | (e1, e2) when e1 = e2 -> CstI 0
         | (_, _) -> Sub(e1, e2)
 
-// 1.2.5
+// exercise 1.2.5
 
 let rec diff e var =
     match e with

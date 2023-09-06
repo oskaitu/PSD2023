@@ -22,6 +22,7 @@ let rec lookup env x =
     | [] -> failwith (x + " not found")
     | (y, v) :: r -> if x = y then v else lookup r x
 
+// exercise 2.1
 let rec eval e (env: (string * int) list) : int =
     match e with
     | CstI i -> i
@@ -61,7 +62,7 @@ let rec minus (xs, ys) =
 
 (* Find all variables that occur free in expression e *)
 
-// exercse 2.2
+// exercise 2.2
 let rec freevars e : string list =
     match e with
     | CstI i -> []
@@ -90,6 +91,8 @@ let rec getindex vs x =
     | y :: yr -> if x = y then 0 else 1 + getindex yr x
 
 (* Compiling from expr to texpr *)
+
+// exercise 2.3
 
 let rec tcomp (e: expr) (cenv: string list) : texpr =
     match e with
