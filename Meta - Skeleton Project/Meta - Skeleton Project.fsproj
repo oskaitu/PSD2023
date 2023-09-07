@@ -8,10 +8,12 @@
 
   <ItemGroup>
     <Compile Include="Program.fs" />
+	<None Include="fsharp\HelloLex.fsl" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FsLexYacc" Version="11.2.0" />
+	<PackageReference Include="FsLexYacc.Runtime" Version="11.2.0" />
   </ItemGroup>
 
 </Project>
