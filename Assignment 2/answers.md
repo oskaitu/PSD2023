@@ -19,3 +19,9 @@ We get a .fsi and a .fs file.
 
 ## How many states are there by the automaton of the lexer?
 
+### Exercise BCD 2.1
+
+
+- (a) \b42\b
+- (b) ^(?!.*\b42\b)\d+$
+- (c) ^([4-9][3-9]+)|\d{3,}$
