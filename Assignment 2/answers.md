@@ -27,8 +27,11 @@ We get a .fsi and a .fs file.
 - (c) ^([4-9][3-9]+)|\d{3,}$
 
 
-### Exercise 3.2
+## Exercise 3.2
+### A
 ```regex
 ^a?(b*(ba)*)*$|^(ab)*a?b*$
 ```
 
+### B
+![](3.2_ntf.png)
