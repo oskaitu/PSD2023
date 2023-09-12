@@ -25,3 +25,10 @@ We get a .fsi and a .fs file.
 - (a) \b42\b
 - (b) ^(?!.*\b42\b)\d+$
 - (c) ^([4-9][3-9]+)|\d{3,}$
+
+
+### Exercise 3.2
+```regex
+^a?(b*(ba)*)*$|^(ab)*a?b*$
+```
+
