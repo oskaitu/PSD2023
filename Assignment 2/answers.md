@@ -1,5 +1,6 @@
 # Question 1
 
+we have all things for ex1 in the folder called lexer
 ## Read the specification hello.fsl !
 Done
 
@@ -12,13 +13,16 @@ Character conversion
 # Question 2
 
 ##### Generate the lexer out of the specification using a command prompt. 
+done
 
 ## Which additional file is generated during the process?
 
 We get a .fsi and a .fs file.
 
 ## How many states are there by the automaton of the lexer?
+9 states
 
+program can be found as lexer.exe if you want to test that it works.
 ### Exercise BCD 2.1
 
 - (a) 
