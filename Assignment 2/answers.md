@@ -21,17 +21,20 @@ We get a .fsi and a .fs file.
 
 ### Exercise BCD 2.1
 
-
 - (a) \b42\b
 - (b) ^(?!.*\b42\b)\d+$
 - (c) ^([4-9][3-9]+)|\d{3,}$
 
 
+
 ## Exercise 3.2
+
 ### A
+
 ```regex
 ^a?(b*(ba)*)*$|^(ab)*a?b*$
 ```
 
 ### B
+
 ![](3.2_ntf.png)
