@@ -1,0 +1,25 @@
+{
+module Hello_fslex
+open FSharp.Text.Lexing
+open System
+}
+
+rule Tokenize = parse
+  | ['0'-'9']+               { LexBuffer<char>.LexemeString lexbuf } // Match integers
+  | ['-']?['0'-'9']+('.'['0'-'9']*)?   { LexBuffer<char>.LexemeString lexbuf } // Match floats
+  | _                       { failwith "Lexer error: illegal symbol" }
+
+{
+[<EntryPoint>]
+let main argv =
+    printfn "Hello World from FsLex!\n\nPlease pass a digit or float:"
+    let input = Console.ReadLine()
+    let lexbuf = LexBuffer<char>.FromString input
+    try
+        let res = Tokenize lexbuf
+        printfn "The lexer recognizes %s" res
+        0
+    with
+        | ex -> printfn "Lexer error: %s" ex.Message
+                -1
+}
