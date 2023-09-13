@@ -21,10 +21,28 @@ We get a .fsi and a .fs file.
 
 ### Exercise BCD 2.1
 
-- (a) \b42\b
-- (b) ^(?!.*\b42\b)\d+$
-- (c) ^([4-9][3-9]+)|\d{3,}$
+- (a) 
+```regex
+\b42\b
+```
+- (b) 
+```
+^(?!.*\b42\b)\d+$
+```
+- (c) 
+```regex
+^([4-9][3-9]+)|\d{3,}$
+```
 
+### Exercise BCD 2.2
+
+#### NFA
+
+![NFA 2.2](NFA2.2.jpg)
+
+#### DFA
+
+![DFA 2.2](DFA2.2.png)
 
 
 ## Exercise 3.2
