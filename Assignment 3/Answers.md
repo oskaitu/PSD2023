@@ -89,3 +89,92 @@ let compString (s:string) :sinstr list =
 
 
 ## 3.7
+
+* From Absyn
+``` F#
+
+module Absyn
+
+type expr = 
+  | CstI of int
+  | Var of string
+  | Let of string * expr * expr
+  | Prim of string * expr * expr
+  | If of expr * expr * expr
+
+
+
+```
+
+* From ExprLex.fsl
+``` F#
+
+let keyword s =
+    match s with
+    | "let" -> LET
+    | "in"  -> IN
+    | "end" -> END
+    | "if" -> IF
+    | "then" -> THEN
+    | "else" -> ELSE
+    | _     -> NAME s
+}
+
+```
+
+* From ExprPar
+``` F#
+
+
+%token <int> CSTINT
+%token <string> NAME
+%token PLUS MINUS TIMES DIVIDE EQ
+%token END IN LET IF THEN ELSE
+%token LPAR RPAR
+%token EOF
+
+%left MINUS PLUS        /* lowest precedence  */
+%left TIMES             /* highest precedence */
+
+%start Main
+%type <Absyn.expr> Main 
+
+%%
+
+Main:
+    Expr EOF                            { $1                }
+;
+
+Expr:
+    NAME                                { Var $1            }
+  | CSTINT                              { CstI $1           }
+  | MINUS CSTINT                        { CstI (- $2)       }
+  | LPAR Expr RPAR                      { $2                }
+  | LET NAME EQ Expr IN Expr END        { Let($2, $4, $6)   }
+  | IF Expr THEN Expr ELSE Expr         { If($2, $4, $6)    }
+  | Expr TIMES Expr                     { Prim("*", $1, $3) }
+  | Expr PLUS  Expr                     { Prim("+", $1, $3) }  
+  | Expr MINUS Expr                     { Prim("-", $1, $3) } 
+;
+
+```
+
+* Testcase 
+  > open Parse;;
+  > fromString ("if 2 then 3 else 4");;
+    
+      val it : Absyn.expr = If (CstI 2, CstI 3, CstI 4) 
+
+* Question about assumptions 
+
+      building action table...        shift/reduce error at state 23 on terminal TIMES between {[explicit left 10000] shift(27)} and {noprec reduce(Expr:'IF' Expr 'THEN' Expr 'ELSE' Expr)} - assuming the former because we prefer shift when unable to compare precedences
+        shift/reduce error at state 23 on terminal PLUS between {[explicit left 9999] shift(28)} and {noprec reduce(Expr:'IF' Expr 'THEN' Expr 'ELSE' Expr)} - assuming the former because we prefer shift when unable to compare precedences
+        shift/reduce error at state 23 on terminal MINUS between {[explicit left 9999] shift(29)} and {noprec reduce(Expr:'IF' Expr 'THEN' Expr 'ELSE' Expr)} - assuming the former because we prefer shift when unable to compare precedences
+        time: 00:00:00.0348698
+        building goto table...        time: 00:00:00.0008235
+        returning tables.
+        3 shift/reduce conflicts
+        consider setting precedences explicitly using %left %right and %nonassoc on terminals and/or setting explicit precedence on rules using %prec
+  
+  it seems we made a mistake about precedence, how do we solve this? 
+
