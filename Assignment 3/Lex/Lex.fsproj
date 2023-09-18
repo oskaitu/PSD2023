@@ -5,11 +5,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Absyn.fs" />
-    <Compile Include="Expr.fs" />
     <Compile Include="ExprLex.fs" />
     <Compile Include="ExprPar.fsi" />
     <Compile Include="ExprPar.fs" />
     <Compile Include="Parse.fs" />
+    <Compile Include="Expr.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

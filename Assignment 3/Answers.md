@@ -15,34 +15,44 @@
 ![tree](tree.png)  
 ## 3.5
 
-> fromString "2 + 3 * 4";;
-val it : Absyn.expr = Prim ("+", CstI 2, Prim ("*", CstI 3, CstI 4))
+  > fromString "2 + 3 * 4";;
 
-fromString "1+2* 3";; 
+  val it : Absyn.expr = Prim ("+", CstI 2, Prim ("*", CstI 3, CstI 4))
+
+> fromString "1+2* 3";; 
+> 
 val it : Absyn.expr = Prim ("+", CstI 1, Prim ("*", CstI 2, CstI 3))
 
 > fromString "1-2- 3";;
+> 
 val it : Absyn.expr = Prim ("-", Prim ("-", CstI 1, CstI 2), CstI 3)
 
 > fromString "1 + -2";;
+> 
 val it : Absyn.expr = Prim ("+", CstI 1, CstI -2)
 
 > fromString "x++";;
+> 
 System.Exception: parse error near line 1, column 3
 
 > fromString "1 + 1.2";;
+> 
 System.Exception: Lexer error: illegal symbol near line 1, column 6
 
 > fromString "1 + ";;
+> 
 System.Exception: parse error near line 1, column 4
 
 > fromString "let z = 17) in z+2*3 end";;
+> 
 System.Exception: parse error near line 1, column 11
 
 > fromString "let in = (17) in z+2*3 end";;
+> 
 System.Exception: parse error near line 1, column 6
 
 > fromString "1 + let x=5 in let y=7+x in y+y end + x end";;
+> 
 val it : Absyn.expr =
   Prim
     ("+", CstI 1,
@@ -55,5 +65,27 @@ val it : Absyn.expr =
            Var "x")))
 
 ## 3.6
+
+To test run this command in Lex folder:
+
+`fsharpi -r FsLexYacc.Runtime.dll Absyn.fs ExprPar.fs ExprLex.fs Parse.fs Expr.fs`
+
+* Code: 
+``` F#
+
+//Should this be with a list of integers like last week or sinstr list as asked in the book? 
+let compString (s:string) :sinstr list = 
+      let first = Parse.fromString s
+      let second = scomp first []
+      second 
+
+
+```
+
+* Example output 
+    > Expr.compString "2+2";;
+
+      val it : Expr.sinstr list = [SCstI 2; SCstI 2; SAdd]
+
 
 ## 3.7

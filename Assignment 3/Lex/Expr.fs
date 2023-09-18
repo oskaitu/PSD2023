@@ -3,7 +3,6 @@
 (* Simple expression language with various evaluators and compilers *)
 
 module Expr
-
 open System.IO
 open Absyn
 
@@ -333,3 +332,9 @@ let s3 = scomp e3 []
 let intsToFile (inss : int list) (fname : string) = 
     let text = String.concat " " (List.map string inss)
     System.IO.File.WriteAllText(fname, text);;
+
+//Should this be with a list of integers like last week or sinstr list as asked in the book? 
+let compString (s:string) :sinstr list = 
+      let first = Parse.fromString s
+      let second = scomp first []
+      second 
