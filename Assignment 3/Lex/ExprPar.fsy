@@ -9,16 +9,21 @@
 %token <int> CSTINT
 %token <string> NAME
 %token PLUS MINUS TIMES DIVIDE EQ
-%token END IN LET IF THEN ELSE
+%token END IN LET 
+%token ELSE THEN IF
 %token LPAR RPAR
 %token EOF
 
-%left MINUS PLUS        /* lowest precedence  */
-%left TIMES             /* highest precedence */
+/* lowest precedence  */
+%left ELSE THEN IF
+%left MINUS PLUS        
+%left TIMES       
+/* highest precedence */      
 
 %start Main
 %type <Absyn.expr> Main 
-
+// (if 1 then 1 else 1 + 1)
+// (x * y) * z
 %%
 
 Main:
