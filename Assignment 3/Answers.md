@@ -134,8 +134,11 @@ let keyword s =
 %token LPAR RPAR
 %token EOF
 
-%left MINUS PLUS        /* lowest precedence  */
-%left TIMES             /* highest precedence */
+/* lowest precedence  */
+%left ELSE THEN IF
+%left MINUS PLUS        
+%left TIMES       
+/* highest precedence */     
 
 %start Main
 %type <Absyn.expr> Main 
@@ -165,17 +168,4 @@ Expr:
   > fromString ("if 2 then 3 else 4");;
     
       val it : Absyn.expr = If (CstI 2, CstI 3, CstI 4) 
-
-* Question about assumptions 
-
-      building action table...        shift/reduce error at state 23 on terminal PLUS between {[explicit left 9999] shift(25)} and {noprec reduce(Expr:'IF' Expr 'THEN' Expr 'ELSE' Expr)} - assuming the former because we prefer shift when unable to compare precedences
-        shift/reduce error at state 23 on terminal MINUS between {[explicit left 9999] shift(26)} and {noprec reduce(Expr:'IF' Expr 'THEN' Expr 'ELSE' Expr)} - assuming the former because we prefer shift when unable to compare precedences
-        shift/reduce error at state 23 on terminal TIMES between {[explicit left 10000] shift(24)} and {noprec reduce(Expr:'IF' Expr 'THEN' Expr 'ELSE' Expr)} - assuming the former because we prefer shift when unable to compare precedences
-        time: 00:00:00.0678728
-        building goto table...        time: 00:00:00.0012596
-        returning tables.
-        3 shift/reduce conflicts
-        consider setting precedences explicitly using %left %right and %nonassoc on terminals and/or setting explicit precedence on rules using %prec
-  
-  it seems we made a mistake about precedence, how do we solve this? 
 
