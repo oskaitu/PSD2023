@@ -70,3 +70,41 @@ let ex5 = fromString
                  in fib 25 
                  end
               end";;
+        
+let ex6 = fromString 
+              "let sum n = 
+                if n=0 then n
+                 else n + sum(n-1)
+                   in sum 1000 
+                   end";; 
+
+let ex7 = fromString 
+              "let pow n = 
+                      if n=1 then n
+                          else 3 * pow(n-1)
+                            in pow (8+1) end";; 
+
+
+let ex8 = fromString 
+              "let pow n = 
+                      if n=1 then n
+                          else 3 * pow(n-1)
+                            in let powa p = 
+                            if p=0 then 0 
+                            else (pow p) + powa (p-1)                            
+                            in powa (11+1)
+                            end end";; 
+
+
+let ex9 = fromString 
+              "let pow n =
+                      if n=1 then n
+                        else n * n * n * n * n * n * n *n  
+                         in let powa p = 
+                          if p=0 then 0 
+                            else (pow p) + powa (p-1)
+                            in powa (10) 
+                            end end";;
+
+
+
