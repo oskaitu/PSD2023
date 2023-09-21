@@ -97,11 +97,9 @@ let ex8 = fromString
 
 
 let ex9 = fromString 
-              "let pow n =
-                      if n=1 then n
-                        else n * n * n * n * n * n * n *n  
+              "let pow n = n * n * n * n * n * n * n *n  
                          in let powa p = 
-                          if p=0 then 0 
+                          if p=0 then p 
                             else (pow p) + powa (p-1)
                             in powa (10) 
                             end end";;

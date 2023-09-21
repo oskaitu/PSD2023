@@ -105,20 +105,18 @@ val it : int = 265720
 
 ``` Fsharp
 
-> let ex9 = fromString 
-              "let pow n =
-                      if n=1 then n
-                        else n * n * n * n * n * n * n *n  
+let ex9 = fromString 
+              "let pow n = n * n * n * n * n * n * n *n  
                          in let powa p = 
-                          if p=0 then 0 
+                          if p=0 then p 
                             else (pow p) + powa (p-1)
                             in powa (10) 
                             end end";;
 val ex9 : Absyn.expr =
   Letfun
     ("pow", "n",
-     If
-       (Prim ("=", Var "n", CstI 1), Var "n",
+     Prim
+       ("*",
         Prim
           ("*",
            Prim
@@ -126,14 +124,12 @@ val ex9 : Absyn.expr =
               Prim
                 ("*",
                  Prim
-                   ("*",
-                    Prim
-                      ("*", Prim ("*", Prim ("*", Var "n", Var "n"), Var "n"),
-                       Var "n"), Var "n"), Var "n"), Var "n"), Var "n")),
+                   ("*", Prim ("*", Prim ("*", Var "n", Var "n"), Var "n"),
+                    Var "n"), Var "n"), Var "n"), Var "n"), Var "n"),
      Letfun
        ("powa", "p",
         If
-          (Prim ("=", Var "p", CstI 0), CstI 0,
+          (Prim ("=", Var "p", CstI 0), Var "p",
            Prim
              ("+", Call (Var "pow", Var "p"),
               Call (Var "powa", Prim ("-", Var "p", CstI 1)))),
