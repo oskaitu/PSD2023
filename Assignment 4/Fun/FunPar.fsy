@@ -34,6 +34,11 @@ Main:
     Expr EOF                            { $1 }
 ;
 
+Names1: 
+    NAME                                { [$1]     }
+  | NAME Names1                         { $1 :: $2 }
+;
+
 Expr:
     AtExpr                              { $1                     }
   | AppExpr                             { $1                     }
@@ -56,14 +61,20 @@ AtExpr:
     Const                               { $1                     }
   | NAME                                { Var $1                 }
   | LET NAME EQ Expr IN Expr END        { Let($2, $4, $6)        }
-  | LET NAME NAME EQ Expr IN Expr END   { Letfun($2, $3, $5, $7) }
+  | LET NAME Names1 EQ Expr IN Expr END { Letfun($2, $3, $5, $7) }
   | LPAR Expr RPAR                      { $2                     }
 ;
 
+ListExpressions:
+  AtExpr                                { [$1]                    }
+  | ListExpressions AtExpr              { $2 :: $1                }
+
 AppExpr:
-    AtExpr AtExpr                       { Call($1, $2)           }
-  | AppExpr AtExpr                      { Call($1, $2)           }
+  AtExpr ListExpressions                { Call($1,$2)            }
 ;
+
+
+
 
 Const:
     CSTINT                              { CstI($1)               }

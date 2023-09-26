@@ -105,4 +105,11 @@ let ex9 = fromString
                             end end";;
 
 
+let ex10 = fromString 
+                    "let max2 a b = if a<b then b else a
+                              in let max3 abc= max2 a (max2 b c)
+                                in max3 25 6 62 end
+                              end"
+
+
 

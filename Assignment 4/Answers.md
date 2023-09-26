@@ -233,7 +233,53 @@ let ex1 = Letfun("f1", ["x"], Prim("+", Var "x", CstI 1), Call(Var "f1", [CstI 1
 
 ## Exercise 4.4
 
+* Funpar
 
+``` F#
+
+Names1: 
+    NAME                                { [$1]     }
+  | NAME Names1                         { $1 :: $2 }
+;
+
+AtExpr:
+    Const                               { $1                     }
+  | NAME                                { Var $1                 }
+  | LET NAME EQ Expr IN Expr END        { Let($2, $4, $6)        }
+  | LET NAME Names1 EQ Expr IN Expr END { Letfun($2, $3, $5, $7) }
+  | LPAR Expr RPAR                      { $2                     }
+;
+
+ListExpressions:
+  AtExpr                                { [$1]                    }
+  | ListExpressions AtExpr              { $2 :: $1                }
+
+AppExpr:
+  AtExpr ListExpressions                { Call($1,$2)            }
+;
+
+```
+
+*Example of running pow
+
+``` F#
+
+> let hotdog = fromString "let pow x n = if n=0 then 1 else x * pow x (n-1) in pow 3 8 end" 
+
+val hotdog : expr =
+  Letfun
+    ("pow", ["x"; "n"],
+     If
+       (Prim ("=", Var "n", CstI 0), CstI 1,
+        Prim
+          ("*", Var "x",
+           Call (Var "pow", [Prim ("-", Var "n", CstI 1); Var "x"]))),
+     Call (Var "pow", [CstI 8; CstI 3]))
+
+> run hotdog;;
+val it : int = 6561
+
+```
 
 
 ## Exercise 4.5
