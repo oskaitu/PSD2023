@@ -146,8 +146,94 @@ val it : int = 167731333
 
 ## Exercise 4.3
 
+* Absyn
+
+``` Fsharp
+
+type expr = 
+  | CstI of int
+  | CstB of bool
+  | Var of string
+  | Let of string * expr * expr
+  | Prim of string * expr * expr
+  | If of expr * expr * expr
+  | Letfun of string * string list * expr * expr (* (f, x, fBody, letBody) *)
+  | Call of expr * expr list
+
+```
+
+**Fun.fs** 
+
+* Closure 
+
+
+``` Fsharp
+
+type value = 
+  | Int of int
+  | Closure of string * string list * expr * value env (* (f, x, fBody, fDeclEnv) *)
+
+```
+
+* Eval 
+
+``` Fsharp
+
+let rec eval (e: expr) (env: value env) : int =
+    match e with
+    | CstI i -> i
+    | CstB b -> if b then 1 else 0
+    | Var x ->
+        match lookup env x with
+        | Int i -> i
+        | _ -> failwith "eval Var"
+    | Prim(ope, e1, e2) ->
+        let i1 = eval e1 env
+        let i2 = eval e2 env
+
+        match ope with
+        | "*" -> i1 * i2
+        | "+" -> i1 + i2
+        | "-" -> i1 - i2
+        | "=" -> if i1 = i2 then 1 else 0
+        | "<" -> if i1 < i2 then 1 else 0
+        | _ -> failwith ("unknown primitive " + ope)
+    | Let(x, eRhs, letBody) ->
+        let xVal = Int(eval eRhs env)
+        let bodyEnv = (x, xVal) :: env
+        eval letBody bodyEnv
+    | If(e1, e2, e3) ->
+        let b = eval e1 env
+        if b <> 0 then eval e2 env else eval e3 env
+    | Letfun(f, paramos, fBody, letBody) ->
+        let bodyEnv = (f, Closure(f, paramos, fBody, env)) :: env
+        eval letBody bodyEnv
+    | Call(Var f, eArg) ->
+        let fClosure = lookup env f
+
+        match fClosure with
+        | Closure(f, paramosdos, fBody, fDeclEnv) ->
+            let xVal = List.fold (fun acc los -> Int(eval los env) :: acc) [] eArg // Vi skal nu folde over alle values, i stedet for den ene som den tog før
+            let argOs = List.zip paramosdos xVal // Kombinerer nu de to lister ved hjælp af zip funktionen
+            let fBodyEnv = argOs @ (f, fClosure) :: fDeclEnv // skal nu merges med de andre envs
+            eval fBody fBodyEnv
+        | _ -> failwith "eval Call: not a function"
+    | Call _ -> failwith "eval Call: not first-order function"
+
+
+```
+
+* Example of new version with lists
+
+``` F#
+
+let ex1 = Letfun("f1", ["x"], Prim("+", Var "x", CstI 1), Call(Var "f1", [CstI 12]));;
+
+```
 
 ## Exercise 4.4
+
+
 
 
 ## Exercise 4.5
