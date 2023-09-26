@@ -283,3 +283,87 @@ val it : int = 6561
 
 
 ## Exercise 4.5
+
+* Funpar 
+
+``` F#
+
+
+%token ELSE END FALSE IF IN LET NOT THEN TRUE AND OR
+%token PLUS MINUS TIMES DIV MOD
+%token EQ NE GT LT GE LE
+%token LPAR RPAR 
+%token EOF
+
+%left OR  /* lowest precedence  */
+%left AND
+%left ELSE              
+%left EQ NE 
+%left GT LT GE LE
+%left PLUS MINUS
+%left TIMES DIV MOD 
+%nonassoc NOT           /* highest precedence  */
+
+  | Expr AND   Expr                     { If($1,$3, CstB false ) }
+  | Expr OR    Expr                     { If($1, CstB true, $3  )}
+;
+
+```
+
+*  FunLex
+
+``` F#
+
+rule Token = parse
+  | [' ' '\t' '\r'] { Token lexbuf }
+  | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Token lexbuf }
+  | ['0'-'9']+      { CSTINT (System.Int32.Parse (lexemeAsString lexbuf)) }
+  | ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']*
+                    { keyword (lexemeAsString lexbuf) }
+  | "(*"            { commentStart := lexbuf.StartPos;
+                      commentDepth := 1; 
+                      SkipComment lexbuf; Token lexbuf }
+  | '='             { EQ }
+  | "<>"            { NE }
+  | '>'             { GT }
+  | '<'             { LT }
+  | ">="            { GE }
+  | "<="            { LE }
+  | '+'             { PLUS }                     
+  | '-'             { MINUS }                     
+  | '*'             { TIMES }                     
+  | '/'             { DIV }                     
+  | '%'             { MOD }
+  | '('             { LPAR }
+  | ')'             { RPAR }
+  | "&&"            { AND } 
+  | "||"            { OR  }
+  | eof             { EOF }
+  | _               { failwith "Lexer error: illegal symbol" }
+
+```
+
+
+* Examples
+
+``` F#
+(*&& should be false*)
+
+> let hotdog = fromString"true && false";;  
+val hotdog : Absyn.expr = If (CstB true, CstB false, CstB false)
+
+> run hotdog;;
+val it : int = 0
+
+
+(*|| should be true*)
+
+> let gothotdog = fromString "false || true";;
+val gothotdog : Absyn.expr = If (CstB false, CstB true, CstB true)
+
+> run gothotdog;;
+val it : int = 1
+
+
+
+```
