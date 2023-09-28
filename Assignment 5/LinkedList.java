@@ -4,6 +4,8 @@
 // Compile with
 //   javac LinkedList.java
 
+import java.util.Arrays;
+
 class TestLinkedList {
   public static void main(String[] args) {
     LinkedList<Person> names = new LinkedList<Person>();
@@ -117,8 +119,14 @@ class LinkedList<T> {
   }
 }
 
+
+
 // Corresponds to an F# or ML function type 'A -> 'R
 
 interface Fun<A,R> {
   R invoke(A x);
 }
+
+
+
+
