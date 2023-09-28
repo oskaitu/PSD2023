@@ -52,7 +52,6 @@ type typ =
      | TypI                                (* integers                   *)
      | TypB                                (* booleans                   *)
      | TypF of typ * typ                   (* (argumenttype, resulttype) *)
-     | TypL of typ list                    (* list*)
      | TypV of typevar                     (* type variable              *)
 
 and tyvarkind =  
