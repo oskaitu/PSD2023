@@ -228,6 +228,162 @@ Which looks very much like any other higher-order function from f# since we can 
 
 ## 6.2
 
+**Absyn**
+
+``` F#
+
+type expr = 
+  | CstI of int
+  | CstB of bool
+  | Var of string
+  | Let of string * expr * expr
+  | Prim of string * expr * expr
+  | If of expr * expr * expr
+  | Letfun of string * string * expr * expr    (* (f, x, fBody, letBody) *)
+  | Call of expr * expr
+  | Fun of string * expr // this is added 
+
+```
+
+**fsl**
+
+``` F#
+
+let keyword s =
+    match s with
+    | "fun"  -> FUN (* new *)
+    | "else"  -> ELSE 
+    | "end"   -> END
+    | "false" -> CSTBOOL false
+    | "if"    -> IF
+    | "in"    -> IN
+    | "let"   -> LET
+    | "not"   -> NOT
+    | "then"  -> THEN
+    | "true"  -> CSTBOOL true
+    | _       -> NAME s
+}
+
+rule Token = parse
+  | [' ' '\t' '\r'] { Token lexbuf }
+  | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Token lexbuf }
+  | ['0'-'9']+      { CSTINT (System.Int32.Parse (lexemeAsString lexbuf)) }
+  | ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']*
+                    { keyword (lexemeAsString lexbuf) }
+  | "(*"            { commentStart := lexbuf.StartPos;
+                      commentDepth := 1; 
+                      SkipComment lexbuf; Token lexbuf }
+  | "->"             { ARROW }                 
+  | '='             { EQ }
+  | "<>"            { NE }
+  | '>'             { GT }
+  | '<'             { LT }
+  | ">="            { GE }
+  | "<="            { LE }
+  | '+'             { PLUS }                     
+  | '-'             { MINUS }                     
+  | '*'             { TIMES }                     
+  | '/'             { DIV }                     
+  | '%'             { MOD }
+  | '('             { LPAR }
+  | ')'             { RPAR }
+  | eof             { EOF }
+  | _               { failwith "Lexer error: illegal symbol" }
+
+```
+
+**fsy**
+
+``` F# 
+
+%left ELSE              /* lowest precedence  */
+%left EQ NE  
+%left GT LT GE LE
+%left PLUS MINUS
+%left TIMES DIV MOD    /* highest precedence  */
+%nonassoc NOT
+%nonassoc ARROW FUN //todo check if this is correct
+
+
+AtExpr:
+    Const                               { $1                     }
+  | NAME                                { Var $1                 }
+  | FUN NAME ARROW Expr                 { Fun($2, $4)            } 
+  | LET NAME EQ Expr IN Expr END        { Let($2, $4, $6)        }
+  | LET NAME NAME EQ Expr IN Expr END   { Letfun($2, $3, $5, $7) }
+  | LPAR Expr RPAR                      { $2                     }
+;
+
+```
+
+**HigherFun**
+
+``` F# 
+
+type value = 
+  | Int of int
+  | Closure of string * string * expr * value env       (* (f, x, fBody, fDeclEnv) *)
+  | Clos of string * expr * value env (* (x,body,declEnv) *)
+
+
+let rec eval (e : expr) (env : value env) : value =
+    match e with
+    | CstI i -> Int i
+    | CstB b -> Int (if b then 1 else 0)
+    | Var x  -> lookup env x
+    | Prim(ope, e1, e2) -> 
+      let v1 = eval e1 env
+      let v2 = eval e2 env
+      match (ope, v1, v2) with
+      | ("*", Int i1, Int i2) -> Int (i1 * i2)
+      | ("+", Int i1, Int i2) -> Int (i1 + i2)
+      | ("-", Int i1, Int i2) -> Int (i1 - i2)
+      | ("=", Int i1, Int i2) -> Int (if i1 = i2 then 1 else 0)
+      | ("<", Int i1, Int i2) -> Int (if i1 < i2 then 1 else 0)
+      |  _ -> failwith "unknown primitive or wrong type"
+    | Let(x, eRhs, letBody) -> 
+      let xVal = eval eRhs env
+      let letEnv = (x, xVal) :: env 
+      eval letBody letEnv
+    | If(e1, e2, e3) -> 
+      match eval e1 env with
+      | Int 0 -> eval e3 env
+      | Int _ -> eval e2 env
+      | _     -> failwith "eval If"
+    | Letfun(f, x, fBody, letBody) -> 
+      let bodyEnv = (f, Closure(f, x, fBody, env)) :: env
+      eval letBody bodyEnv
+    | Call(eFun, eArg) -> 
+      let fClosure = eval eFun env  (* Different from Fun.fs - to enable first class functions *)
+      match fClosure with
+      | Closure (f, x, fBody, fDeclEnv) ->
+        let xVal = eval eArg env
+        let fBodyEnv = (x, xVal) :: (f, fClosure) :: fDeclEnv
+        in eval fBody fBodyEnv
+      | _ -> failwith "eval Call: not a function"
+    | Fun(x, body) -> Clos(x, body, env)
+
+```
+
+**Test** 
+
+``` F# 
+
+> fromString @"fun x -> 2*x";;  
+val it : Absyn.expr = Fun ("x", Prim ("*", CstI 2, Var "x"))
+
+> fromString @"let y = 22 in fun z -> z+y end";;  
+val it : Absyn.expr =
+  Let ("y", CstI 22, Fun ("z", Prim ("+", Var "z", Var "y")))
+
+> run (fromString @"let y = 22 in fun z -> z+y end");;
+val it : HigherFun.value =
+  Clos ("z", Prim ("+", Var "z", Var "y"), [("y", Int 22)])
+
+> run (fromString @"fun x -> 2*x");;
+val it : HigherFun.value = Clos ("x", Prim ("*", CstI 2, Var "x"), [])
+
+```
 
 ## 6.3
 ## 6.4
