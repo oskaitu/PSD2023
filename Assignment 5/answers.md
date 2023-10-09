@@ -206,15 +206,10 @@ val it : HigherFun.value =
 This just returns the closure of adding two to something, it could be used like this: 
 
 ``` F# 
-> let hotdog = fromString @"let add x = let f y = x+y in f end
-in add 2 end";;
-val hotdog : Absyn.expr =
-  Letfun
-    ("add", "x", Letfun ("f", "y", Prim ("+", Var "x", Var "y"), Var "f"),
-     Call (Var "add", CstI 2))
+open Absyn;;
 
-> let hotdog2 = run hotdog;;
-val hotdog2 : HigherFun.value =
+> let add2 = run (fromString @"let add x = let f y = x+y in f end in add 2 end");;
+val add2 : HigherFun.value =
   Closure
     ("f", "y", Prim ("+", Var "x", Var "y"),
      [("x", Int 2);
@@ -223,9 +218,8 @@ val hotdog2 : HigherFun.value =
          ("add", "x", Letfun ("f", "y", Prim ("+", Var "x", Var "y"), Var "f"),
           []))])
 
-> open Absyn;;
-> let res2 = eval(Call(Var "hotdog2", CstI 5)) [("hotdog2",hotdog2)];;
-val res2 : value = Int 7
+> let res = eval(Call(Var "add2", CstI 5)) [("add2",add2)];;
+val res : HigherFun.value = Int 7
 
 ```
 
