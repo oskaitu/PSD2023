@@ -138,7 +138,103 @@ System.Exception: type error in list
 
 
 ## 6.1
+
+**p1**
+``` F# 
+
+> run (fromString @"let add x = let f y = x+y in f end
+in add 2 5 end");;
+val it : HigherFun.value = Int 7
+
+```
+
+**p2**
+``` F# 
+
+> run (fromString @"let add x = let f y = x+y in f end
+in let addtwo = add 2
+in addtwo 5 end
+end");;
+val it : HigherFun.value = Int 7
+
+```
+
+**p3**
+``` F# 
+
+> run (fromString @"let add x = let f y = x+y in f end
+in let addtwo = add 2
+in let x = 77 in addtwo 5 end
+end
+end");;
+val it : HigherFun.value = Int 7
+
+```
+
+the scope of x = 77 is local to that call
+and we dont utilize x in this case, we just declare it.
+Were we do change the code to use x it would be like below 
+
+``` F# 
+
+> run (fromString @"let add x = let f y = x+y in f end
+in let addtwo = add 2
+in let x = 77 in addtwo x end
+end
+end");;
+val it : HigherFun.value = Int 79
+
+```
+
+
+**p4**
+``` F# 
+
+> run (fromString @"let add x = let f y = x+y in f end
+in add 2 end");;
+val it : HigherFun.value =
+  Closure
+    ("f", "y", Prim ("+", Var "x", Var "y"),
+     [("x", Int 2);
+      ("add",
+       Closure
+         ("add", "x", Letfun ("f", "y", Prim ("+", Var "x", Var "y"), Var "f"),
+          []))])
+>
+
+```
+This just returns the closure of adding two to something, it could be used like this: 
+
+``` F# 
+> let hotdog = fromString @"let add x = let f y = x+y in f end
+in add 2 end";;
+val hotdog : Absyn.expr =
+  Letfun
+    ("add", "x", Letfun ("f", "y", Prim ("+", Var "x", Var "y"), Var "f"),
+     Call (Var "add", CstI 2))
+
+> let hotdog2 = run hotdog;;
+val hotdog2 : HigherFun.value =
+  Closure
+    ("f", "y", Prim ("+", Var "x", Var "y"),
+     [("x", Int 2);
+      ("add",
+       Closure
+         ("add", "x", Letfun ("f", "y", Prim ("+", Var "x", Var "y"), Var "f"),
+          []))])
+
+> open Absyn;;
+> let res2 = eval(Call(Var "hotdog2", CstI 5)) [("hotdog2",hotdog2)];;
+val res2 : value = Int 7
+
+```
+
+Which looks very much like any other higher-order function from f# since we can call the closure with an argument and get the result for any input instead of having it hard-coded like in p1-p3
+
+
 ## 6.2
+
+
 ## 6.3
 ## 6.4
 ## 6.5

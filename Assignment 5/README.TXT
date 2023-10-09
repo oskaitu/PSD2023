@@ -19,7 +19,7 @@ B. Generating and compiling the lexer and parser, and loading them:
 
    fsyacc --module FunPar FunPar.fsy
    fslex --unicode FunLex.fsl
-   fsharpi -r ~/fsharp/FsLexYacc.Runtime.dll Absyn.fs FunPar.fs FunLex.fs Parse.fs   
+   fsharpi -r FsLexYacc.Runtime.dll Absyn.fs FunPar.fs FunLex.fs Parse.fs   
 
    open Parse;;
    let e1 = fromString "5+7";;
@@ -60,7 +60,7 @@ E. Using the lexer, parser and higher-order evaluator together:
 
    fsyacc --module FunPar FunPar.fsy
    fslex --unicode FunLex.fsl
-   fsharpi -r ~/fsharp/FsLexYacc.Runtime.dll Absyn.fs FunPar.fs FunLex.fs Parse.fs HigherFun.fs ParseAndRunHigher.fs
+   fsharpi -r FsLexYacc.Runtime.dll Absyn.fs FunPar.fs FunLex.fs Parse.fs HigherFun.fs ParseAndRunHigher.fs
 
    open ParseAndRunHigher;;
    run (fromString @"let twice f = let g x = f(f(x)) in g end 
@@ -70,7 +70,7 @@ F. Using the lexer, parser and polymorphic type inference together:
 
    fsyacc --module FunPar FunPar.fsy
    fslex --unicode FunLex.fsl
-   fsharpi -r ~/fsharp/FsLexYacc.Runtime.dll Absyn.fs FunPar.fs FunLex.fs Parse.fs TypeInference.fs ParseAndType.fs
+   fsharpi -r FsLexYacc.Runtime.dll Absyn.fs FunPar.fs FunLex.fs Parse.fs TypeInference.fs ParseAndType.fs
 
    open ParseAndType;;
    inferType (fromString "let f x = 1 in f 7 + f false end");;
