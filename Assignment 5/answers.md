@@ -455,7 +455,7 @@ val it : string = "int"
 
 This is untypeable because we call g with g without g ever being declared as a type. 
 ``` F# 
-inferType (fromString "let f g = g g in f end");;
+> inferType (fromString "let f g = g g in f end");;
 
 
 ```
