@@ -386,5 +386,28 @@ val it : HigherFun.value = Clos ("x", Prim ("*", CstI 2, Var "x"), [])
 ```
 
 ## 6.3
+
+We already added this to verify 6.2 since we thought we were supposed to do that. 
+here are the tests. 
+
+``` F#
+
+> fromString @"let add x = fun y -> x+y
+in add 2 5 end";;
+val it : Absyn.expr =
+  Letfun
+    ("add", "x", Fun ("y", Prim ("+", Var "x", Var "y")),
+     Call (Call (Var "add", CstI 2), CstI 5))
+
+> fromString @"let add = fun x -> fun y -> x+y
+in add 2 5 end";;
+val it : Absyn.expr =
+  Let
+    ("add", Fun ("x", Fun ("y", Prim ("+", Var "x", Var "y"))),
+     Call (Call (Var "add", CstI 2), CstI 5))
+
+
+```
+
 ## 6.4
 ## 6.5
