@@ -544,13 +544,15 @@ val it : string = "('g -> ('h -> 'h))"
 
 ``` F# 
 
+> inferType (fromString "let f x = f x in f end");;
+val it: string = "('e -> 'f)"
 
 ```
 • ’a
 
 ``` F# 
-
-
+> inferType (fromString "let f x = f x in f f end");;
+val it: string = "'f"
 ```
 
 
