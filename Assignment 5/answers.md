@@ -296,24 +296,45 @@ rule Token = parse
 
 ``` F# 
 
+
+%token <int> CSTINT
+%token <string> NAME
+%token <bool> CSTBOOL
+
+%token ELSE END FALSE IF IN LET NOT THEN TRUE ARROW FUN 
+%token PLUS MINUS TIMES DIV MOD
+%token EQ NE GT LT GE LE
+%token LPAR RPAR 
+%token EOF
+
 %left ELSE              /* lowest precedence  */
 %left EQ NE  
 %left GT LT GE LE
 %left PLUS MINUS
-%left TIMES DIV MOD    /* highest precedence  */
+%left TIMES DIV MOD    
+%left ARROW             /* highest precedence  */
+
+%nonassoc FUN  
 %nonassoc NOT
-%nonassoc ARROW FUN //todo check if this is correct
 
-
-AtExpr:
-    Const                               { $1                     }
-  | NAME                                { Var $1                 }
+Expr:
+    AtExpr                              { $1                     }
+  | AppExpr                             { $1                     }
+  | IF Expr THEN Expr ELSE Expr         { If($2, $4, $6)         }
+  | MINUS Expr                          { Prim("-", CstI 0, $2)  }
+  | Expr PLUS  Expr                     { Prim("+",  $1, $3)     }
+  | Expr MINUS Expr                     { Prim("-",  $1, $3)     }
+  | Expr TIMES Expr                     { Prim("*",  $1, $3)     }
+  | Expr DIV   Expr                     { Prim("/",  $1, $3)     } 
+  | Expr MOD   Expr                     { Prim("%",  $1, $3)     }
+  | Expr EQ    Expr                     { Prim("=",  $1, $3)     }
+  | Expr NE    Expr                     { Prim("<>", $1, $3)     }
+  | Expr GT    Expr                     { Prim(">",  $1, $3)     }
+  | Expr LT    Expr                     { Prim("<",  $1, $3)     }
+  | Expr GE    Expr                     { Prim(">=", $1, $3)     }
+  | Expr LE    Expr                     { Prim("<=", $1, $3)     }
   | FUN NAME ARROW Expr                 { Fun($2, $4)            } 
-  | LET NAME EQ Expr IN Expr END        { Let($2, $4, $6)        }
-  | LET NAME NAME EQ Expr IN Expr END   { Letfun($2, $3, $5, $7) }
-  | LPAR Expr RPAR                      { $2                     }
 ;
-
 ```
 
 **HigherFun**
@@ -410,4 +431,121 @@ val it : Absyn.expr =
 ```
 
 ## 6.4
+
+
 ## 6.5
+
+### 6.5.1
+
+**p1** 
+
+``` F# 
+
+> inferType (fromString "let f x = 1 in f f end");;
+val it : string = "int"
+
+```
+
+**p2** 
+
+This is untypeable because we call g with g without g ever being declared as a type. 
+``` F# 
+inferType (fromString "let f g = g g in f end");;
+
+
+```
+
+
+**p3** 
+
+``` F# 
+
+> inferType (fromString "let f x = let g y = y in g false end in f 42 end");;
+val it : string = "bool"
+
+```
+
+**p4** 
+
+This does not work because x is of type int and y is of type bool, even though there is never a case where y is returned this is still a type error, but would work if we didnt do typechecking before running the program like we do in javascript. 
+
+``` F# 
+
+> inferType (fromString "let f x = let g y = if true then y else x in g false end in f 42 end");;
+System.Exception: type error: bool and int
+```
+
+**p5** 
+
+``` F# 
+
+> inferType (fromString "let f x = let g y = if true then y else x in g false end in f true end");;
+val it : string = "bool"
+
+```
+
+### 6.5.2
+
+• bool -> bool
+
+``` F# 
+
+> inferType (fromString "let f x = x in f true end");;
+val it : string = "bool"
+
+```
+
+• int -> int
+
+``` F# 
+
+> inferType (fromString "let f x = x in f 666 end");;
+val it : string = "int"
+
+```
+• int -> int -> int
+
+``` F# 
+
+inferType (fromString "let f x = let g y = x-y in g 597 end in f 666 end");;
+val it : string = "int"
+
+
+```
+• ’a -> ’b -> ’a
+
+``` F#
+
+> inferType (fromString "let f x = let f y = x in g end in f end");;
+val it : string = "('h -> ('g -> 'h))"
+
+
+```
+• ’a -> ’b -> ’b
+
+``` F# 
+
+> inferType (fromString "let f x = let g y = y in g end in f end");;
+val it : string = "('g -> ('h -> 'h))"
+
+```
+• (’a -> ’b) -> (’b -> ’c) -> (’a -> ’c)
+
+``` F# 
+
+
+```
+• ’a -> ’b
+
+``` F# 
+
+
+```
+• ’a
+
+``` F# 
+
+
+```
+
+
