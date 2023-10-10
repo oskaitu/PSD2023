@@ -410,4 +410,8 @@ val it : Absyn.expr =
 ```
 
 ## 6.4
+
+**(i)**
+![Dont worry bout it](attachments/64i.jpg)
+
 ## 6.5
