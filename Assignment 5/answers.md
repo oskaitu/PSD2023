@@ -414,4 +414,7 @@ val it : Absyn.expr =
 **(i)**
 ![Dont worry bout it](attachments/64i.jpg)
 
+**(ii)**
+![Dont worry bout it](attachments/64ii.jpg)
+
 ## 6.5
