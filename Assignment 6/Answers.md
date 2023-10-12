@@ -39,7 +39,9 @@ void arrsum(int n, int arr[], int *sump ){
     
 }
 ```
+
 To run it we had to add that main takes an integer to get the result, otherwise it just gave us <fun:Invoke@3236>
+
 ```c
 run (fromFile "ex72i.c") [4];;
 37 
