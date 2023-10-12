@@ -1,17 +1,25 @@
-
+int *sump;
 
 void main(int n){
-    int array[4];
-    array[0] = 7;
-    array[1] = 13;
-    array[2] = 9;
-    array[3] = 8;    
-    int *sump;
-
+    int array[20];
+    squares(n, array);
     arrsum(n, array, sump);
+
     print *sump;
     println;
+
 }
+
+void squares(int n, int arr[]){
+    int i;
+    i = 0;
+
+    while(i < n){
+        arr[i] = i * i;
+        i = i + 1;
+    }
+}
+
 void arrsum(int n, int arr[], int *sump ){
     int i;
     i = 0;

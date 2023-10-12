@@ -51,6 +51,128 @@ val it : Interp.store =
      (7, 4); ...]
 ```
 
+## (ii)
+
+Implementation
+
+```c
+int *sump;
+
+void main(int n){
+    int array[20];
+    squares(n, array);
+    arrsum(n, array, sump);
+
+    print *sump;
+    println;
+
+}
+
+void squares(int n, int arr[]){
+    int i;
+    i = 0;
+
+    while(i < n){
+        arr[i] = i * i;
+        i = i + 1;
+    }
+}
+
+void arrsum(int n, int arr[], int *sump ){
+    int i;
+    i = 0;
+    int sum;
+    sum = 0;
+
+    while(i < n){
+        sum = sum + arr[i];
+        i = i + 1;
+    }
+    *sump = sum;
+    
+}
+```
+What it returns
+
+```c
+run (fromFile "ex72ii.c") [5];;
+30 
+val it : Interp.store =
+  map
+    [(-1, 30); (0, -1); (1, 5); (2, 0); (3, 1); (4, 4); (5, 9); (6, 16);
+     (7, -999); ...]
+```
+
+## (iii)
+Implementation
+```c
+
+void main(int x){
+    int arr[7];
+    arr[0] = 1;
+    arr[1] = 2;
+    arr[2] = 1;
+    arr[3] = 1;
+    arr[4] = 1;
+    arr[5] = 2;
+    arr[6] = 0;
+
+    int n;
+    n = 7;
+
+    int max;
+    max = 4;
+
+    int i;
+    i = 0;
+
+    int freq[4];
+
+    while( i < max){
+        freq[i] = 0;
+        i = i + 1;
+    }
+   
+
+    histogram(n, arr, max, freq);
+
+    int i;
+    i = 0;
+    while(i < max){
+        print freq[i];
+        println;
+        i = i + 1;
+    }
+
+
+}
+
+void histogram(int n, int ns[], int max, int freq[]){
+    int i;
+    i = 0;
+    int hotdog;
+
+    while(i < n){
+        hotdog = ns[i];
+        freq[hotdog] = freq[hotdog] + 1;
+        i = i + 1;
+    }
+}
+```
+Returns
+
+```c
+>  run (fromFile "ex72iii.c") [4];;
+1 
+4
+2
+0
+val it : Interp.store =
+  map
+    [(0, 4); (1, 1); (2, 2); (3, 1); (4, 1); (5, 1); (6, 2); (7, 0); (8, 1);
+     ...]
+```
+
 # 7.3
 
 # 7.4
