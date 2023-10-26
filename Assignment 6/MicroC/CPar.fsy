@@ -14,7 +14,7 @@ let nl = CstI 10
 %token <int> CSTINT CSTBOOL
 %token <string> CSTSTRING NAME
 
-%token CHAR ELSE IF INT NULL PRINT PRINTLN RETURN VOID WHILE
+%token CHAR ELSE IF INT NULL PRINT PRINTLN RETURN VOID WHILE FOR
 %token PLUS MINUS TIMES DIV MOD
 %token EQ NE GT LT GE LE
 %token NOT SEQOR SEQAND
@@ -23,13 +23,13 @@ let nl = CstI 10
 
 %right ASSIGN             /* lowest precedence */
 %nonassoc PRINT
-%left SEQOR
+%left SEQOR 
 %left SEQAND
 %left EQ NE 
 %left GT LT GE LE
 %left PLUS MINUS
 %left TIMES DIV MOD 
-%nonassoc NOT AMP 
+%nonassoc NOT AMP FOR
 %nonassoc LBRACK          /* highest precedence  */
 
 %start Main
@@ -106,6 +106,7 @@ StmtU:
     IF LPAR Expr RPAR StmtM ELSE StmtU  { If($3, $5, $7)       }
   | IF LPAR Expr RPAR Stmt              { If($3, $5, Block []) }
   | WHILE LPAR Expr RPAR StmtU          { While($3, $5)        }
+  | FOR LPAR Expr SEMI Expr SEMI Expr RPAR Stmt { Block [Stmt(Expr($3));Stmt(While($5, Block[Stmt($9);Stmt(Expr($7))]))]}
 ;
 
 Expr: 
