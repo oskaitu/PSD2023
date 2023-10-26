@@ -348,4 +348,139 @@ val it : Interp.store =
 
 # 7.4
 
+**Absyn.fs**
+```c
+and expr =                                                         
+  | Access of access                 (* x    or  *p    or  a[e]     *)
+  | Assign of access * expr          (* x=e  or  *p=e  or  a[e]=e   *)
+  | Addr of access                   (* &x   or  &*p   or  &a[e]    *)
+  | CstI of int                      (* Constant                    *)
+  | Prim1 of string * expr           (* Unary primitive operator    *)
+  | Prim2 of string * expr * expr    (* Binary primitive operator   *)
+  | Andalso of expr * expr           (* Sequential and              *)
+  | Orelse of expr * expr            (* Sequential or               *)
+  | Call of string * expr list       (* Function call f(...)        *)
+  | PreInc of access                 (* C/C++/Java/C# ++i or ++a[e] *)
+  | PreDec of access                 (* C/C++/Java/C# --i or --a[e] *)
+        
+```
+
+**Interp.fs**
+```c
+and eval e locEnv gloEnv store : int * store = 
+  match e with
+    | Access acc     -> let (loc, store1) = access acc locEnv gloEnv store
+                        (getSto store1 loc, store1) 
+    | Assign(acc, e) -> let (loc, store1) = access acc locEnv gloEnv store
+                        let (res, store2) = eval e locEnv gloEnv store1
+                        (res, setSto store2 loc res) 
+    | CstI i         -> (i, store)
+    | Addr acc       -> access acc locEnv gloEnv store
+    | Prim1(ope, e1) ->
+      let (i1, store1) = eval e1 locEnv gloEnv store
+      let res =
+          match ope with
+          | "!"      -> if i1=0 then 1 else 0
+          | "printi" -> (printf "%d " i1; i1)
+          | "printc" -> (printf "%c" (char i1); i1)
+          | _        -> failwith ("unknown primitive " + ope)
+      (res, store1) 
+    | Prim2(ope, e1, e2) ->
+      let (i1, store1) = eval e1 locEnv gloEnv store
+      let (i2, store2) = eval e2 locEnv gloEnv store1
+      let res =
+          match ope with
+          | "*"  -> i1 * i2
+          | "+"  -> i1 + i2
+          | "-"  -> i1 - i2
+          | "/"  -> i1 / i2
+          | "%"  -> i1 % i2
+          | "==" -> if i1 =  i2 then 1 else 0
+          | "!=" -> if i1 <> i2 then 1 else 0
+          | "<"  -> if i1 <  i2 then 1 else 0
+          | "<=" -> if i1 <= i2 then 1 else 0
+          | ">=" -> if i1 >= i2 then 1 else 0
+          | ">"  -> if i1 >  i2 then 1 else 0
+          | _    -> failwith ("unknown primitive " + ope)
+      (res, store2) 
+    | Andalso(e1, e2) -> 
+      let (i1, store1) as res = eval e1 locEnv gloEnv store
+      if i1<>0 then eval e2 locEnv gloEnv store1 else res
+    | Orelse(e1, e2) -> 
+      let (i1, store1) as res = eval e1 locEnv gloEnv store
+      if i1<>0 then res else eval e2 locEnv gloEnv store1
+    | Call(f, es) -> callfun f es locEnv gloEnv store 
+    | PreInc acc -> 
+      let (a, store1) = access acc locEnv gloEnv store
+      let aval = getSto store1 a 
+      let res = aval+1
+      let st = setSto store1 a res
+      (res, st)
+    | PreDec acc -> 
+      let (a, store1) = access acc locEnv gloEnv store
+      let aval = getSto store1 a 
+      let res = aval-1
+      let st = setSto store1 a res
+      (res, st)
+```
+
+
 # 7.5
+
+**CLex.fsl**
+```c
+rule Token = parse
+  | [' ' '\t' '\r'] { Token lexbuf }
+  | '\n'            { lexbuf.EndPos <- lexbuf.EndPos.NextLine; Token lexbuf }
+  | ['0'-'9']+      { CSTINT (System.Int32.Parse (lexemeAsString lexbuf)) }  
+  | ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']*
+                    { keyword (lexemeAsString lexbuf) }
+  | '+'             { PLUS } 
+  | "++"            { PREINC }
+  | '-'             { MINUS } 
+  | "--"            { PREDEC }
+
+```
+
+**CPar.fsy**
+```c
+%token PLUS PREINC MINUS PREDEC TIMES DIV MOD 
+
+%left PLUS PREINC MINUS PREDEC
+
+
+
+ExprNotAccess:
+    AtExprNotAccess                     { $1                  }
+  | Access ASSIGN Expr                  { Assign($1, $3)      }
+  | PREINC Access                       { PreInc($2)          }
+  | PREDEC Access                       { PreDec($2)          }
+```
+
+**Examples**
+
+```c
+void main(int n) {
+int i;
+for (i=0; i<99; ++i)
+    --n;
+}
+
+> run (fromFile "exloop.c") [4];; 
+val it : Interp.store = map [(0, -96); (1, 99)]
+
+```
+
+```c
+void main(int n) {
+    int *test[3];
+    print ++*test;
+    println;
+}
+
+> run (fromFile "exarray.c") [4];; 
+-998 
+val it : Interp.store = map [(0, 4); (1, -998); (2, -999); (3, -999); (4, 1)]
+```
+
+
