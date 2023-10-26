@@ -3,5 +3,5 @@
 void main(int n) {
 int i;
 for (i=0; i<100; i=i+1)
-    n = n+i;
+    n = n;
 }
