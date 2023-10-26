@@ -472,6 +472,7 @@ val it : Interp.store = map [(0, -96); (1, 99)]
 ```
 
 ```c
+// This is to show that it's possible to increment expressions that evaluates to a location
 void main(int n) {
     int *test[3];
     print ++*test;
@@ -481,6 +482,33 @@ void main(int n) {
 > run (fromFile "exarray.c") [4];; 
 -998 
 val it : Interp.store = map [(0, 4); (1, -998); (2, -999); (3, -999); (4, 1)]
+```
+
+```c
+//Show that you are able to increment lvalues
+void main(int n) {
+    int arr[4];
+    arr[0] = 1;
+    arr[1] = 1;
+    arr[2] = 1;
+    arr[3] = 2;   
+
+    int i;
+    for(i = 0; i < 4; ++i){
+        ++arr[i];
+        print arr[i];
+        println;
+    }
+}
+
+> run (fromFile "exarray2.c") [1]
+;;
+2 
+2
+2
+3
+val it : Interp.store =
+  map [(0, 1); (1, 2); (2, 2); (3, 2); (4, 3); (5, 1); (6, 4)]
 ```
 
 
