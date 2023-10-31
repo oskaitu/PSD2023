@@ -26,13 +26,15 @@ B. To compile and use the micro-C compiler
 
    open ParseAndComp;;
    compileToFile (fromFile "ex11.c") "ex11.out";;
+   compileToFile (fromFile "testPreIncDec.c") "testPreIncDec.out";;
+
    compile "ex11";;
    #q;;
 
 The Java stack machine:
 
    javac Machine.java
-   java Machine ex11.out 8
+   java Machine ex3.out 4
 
 The C stack machine
    gcc machine.c

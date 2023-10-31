@@ -22,7 +22,9 @@ type token =
   | GE
   | LE
   | PLUS
+  | PREINC
   | MINUS
+  | PREDEC
   | TIMES
   | DIV
   | MOD
@@ -36,6 +38,7 @@ type token =
   | RETURN
   | VOID
   | WHILE
+  | FOR
   | CSTSTRING of (string)
   | NAME of (string)
   | CSTINT of (int)
@@ -62,7 +65,9 @@ type tokenId =
     | TOKEN_GE
     | TOKEN_LE
     | TOKEN_PLUS
+    | TOKEN_PREINC
     | TOKEN_MINUS
+    | TOKEN_PREDEC
     | TOKEN_TIMES
     | TOKEN_DIV
     | TOKEN_MOD
@@ -76,6 +81,7 @@ type tokenId =
     | TOKEN_RETURN
     | TOKEN_VOID
     | TOKEN_WHILE
+    | TOKEN_FOR
     | TOKEN_CSTSTRING
     | TOKEN_NAME
     | TOKEN_CSTINT
