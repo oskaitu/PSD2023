@@ -385,6 +385,98 @@ Prog1 is more efficient because it doesn't need to
 - Avoids storing 20m in i 
 - it uses divide instead of subtracting, making the "calculation" a lot faster.
 
+
+
+
+
+
+
+
+
+
+
+
+We can see that there are a lot of redundant jumps, so the program can be optimized more.
+```bash
+24 
+19 1 5
+25
+15 1
+13 = Done initalizing main
+0 1
+1
+0 1889
+12 = init y and saved 1889
+15 -1 = shrink stack
+16 95 = jump to #1
+13 = #2 = setting up if state
+0 1
+1
+13
+0 1
+1
+11
+0 1
+1
+12
+15 -1
+13
+0 1
+1
+11 = If statement setup done, load everything
+0 4 = logic if statment if y%4
+5
+0 0
+6
+17 77 = Jump to #3 if it's true IFZERO 
+13 ---- this is the start of && (y%100.....)
+0 1
+1
+11
+0 100 = push 100
+5
+0 0
+6 = check EQ MOD
+8
+18 73 = jump if not zero #5 
+13
+0 1
+1
+11
+0 400
+5
+0 0
+6 = Check y% 400 EQ 0
+16 75 = Jump if true #7
+0 1 = #5
+16 79 <- #7 = Jump to #6 
+0 0 <- #3
+17 91 = <- #6, Jump to #4 if also zero 
+13 = get y
+0 1
+1
+11
+22 = print y
+15 -1 
+16 93
+15 0 <- #4
+15 0 
+13 <- #1
+0 1
+1
+11
+13
+0 0
+1
+11
+7 = if y < n 
+18 18 = jump to #2, IFNZRO 
+15 -1 = shrink
+21 0 = return
+```
+
 # 8.5
+
+
 
 # 8.6

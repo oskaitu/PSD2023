@@ -31,6 +31,8 @@ type token =
   | CHAR
   | ELSE
   | IF
+  | TERNARY
+  | COLON
   | INT
   | NULL
   | PRINT
@@ -74,6 +76,8 @@ type tokenId =
     | TOKEN_CHAR
     | TOKEN_ELSE
     | TOKEN_IF
+    | TOKEN_TERNARY
+    | TOKEN_COLON
     | TOKEN_INT
     | TOKEN_NULL
     | TOKEN_PRINT

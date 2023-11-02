@@ -32,7 +32,8 @@
 
 module Comp
 
-
+#load "Absyn.fs"
+#load "Machine.fs"
 open System.IO
 open Absyn
 open Machine
@@ -211,6 +212,9 @@ and cExpr (e : expr) (varEnv : varEnv) (funEnv : funEnv) : instr list =
       cAccess acc varEnv funEnv @ [DUP; LDI; CSTI 1; ADD; STI]
     | PreDec acc -> 
       cAccess acc varEnv funEnv @ [DUP; LDI; CSTI 1; SUB; STI]
+    | Ternary (e1, e2, e3) -> 
+      (cExpr (e1 varEnv funEnv)) @
+      (cExpr (Orelse(e1, e2) varEnv funEnv))
       
       
 
