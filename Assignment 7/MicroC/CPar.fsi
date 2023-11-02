@@ -30,6 +30,7 @@ type token =
   | MOD
   | CHAR
   | ELSE
+  | SWITCH
   | IF
   | TERNARY
   | COLON
@@ -41,6 +42,7 @@ type token =
   | VOID
   | WHILE
   | FOR
+  | CASE
   | CSTSTRING of (string)
   | NAME of (string)
   | CSTINT of (int)
@@ -75,6 +77,7 @@ type tokenId =
     | TOKEN_MOD
     | TOKEN_CHAR
     | TOKEN_ELSE
+    | TOKEN_SWITCH
     | TOKEN_IF
     | TOKEN_TERNARY
     | TOKEN_COLON
@@ -86,6 +89,7 @@ type tokenId =
     | TOKEN_VOID
     | TOKEN_WHILE
     | TOKEN_FOR
+    | TOKEN_CASE
     | TOKEN_CSTSTRING
     | TOKEN_NAME
     | TOKEN_CSTINT
@@ -106,6 +110,7 @@ type nonTerminalId =
     | NONTERM_StmtOrDecSeq
     | NONTERM_Stmt
     | NONTERM_StmtM
+    | NONTERM_Case
     | NONTERM_StmtU
     | NONTERM_Expr
     | NONTERM_ExprNotAccess

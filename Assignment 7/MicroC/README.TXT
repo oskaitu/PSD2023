@@ -27,6 +27,7 @@ B. To compile and use the micro-C compiler
    open ParseAndComp;;
    compileToFile (fromFile "ex11.c") "ex11.out";;
    compileToFile (fromFile "testPreIncDec.c") "testPreIncDec.out";;
+   compileToFile (fromFile "switchtest.c") "switchtest.out";;
 
    compile "ex11";;
    #q;;

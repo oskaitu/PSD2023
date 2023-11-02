@@ -476,7 +476,189 @@ We can see that there are a lot of redundant jumps, so the program can be optimi
 ```
 
 # 8.5
+Absyn.fs
+```fsharp
+and expr =                                                         
+| Ternary of expr * expr * expr    (* e1 ? e2 : e3                *)
 
+```
+
+CLex.fsl
+```fsharp
+rule Token = parse
+
+  | "?"             { TERNARY }
+  | ':'             { COLON }
+```
+CPar.fsy
+
+```fsharp
+%token CHAR ELSE IF TERNARY COLON INT NULL PRINT PRINTLN RETURN VOID WHILE FOR
+
+ExprNotAccess:
+  | Expr TERNARY Expr COLON Expr        { Ternary($1, $3, $5) }
+```
+
+Comp.fs
+```fsharp
+and cExpr (e : expr) (varEnv : varEnv) (funEnv : funEnv) : instr list = 
+    match e with
+    | Access acc     -> cAccess acc varEnv funEnv @ [LDI] 
+    | Assign(acc, e) -> cAccess acc varEnv funEnv @ cExpr e varEnv funEnv @ [STI]
+    | CstI i         -> [CSTI i]
+    | Addr acc       -> cAccess acc varEnv funEnv
+    | Prim1(ope, e1) ->
+      cExpr e1 varEnv funEnv
+      @ (match ope with
+         | "!"      -> [NOT]
+         | "printi" -> [PRINTI]
+         | "printc" -> [PRINTC]
+         | _        -> raise (Failure "unknown primitive 1"))
+    | Prim2(ope, e1, e2) ->
+      cExpr e1 varEnv funEnv
+      @ cExpr e2 varEnv funEnv
+      @ (match ope with
+         | "*"   -> [MUL]
+         | "+"   -> [ADD]
+         | "-"   -> [SUB]
+         | "/"   -> [DIV]
+         | "%"   -> [MOD]
+         | "=="  -> [EQ]
+         | "!="  -> [EQ; NOT]
+         | "<"   -> [LT]
+         | ">="  -> [LT; NOT]
+         | ">"   -> [SWAP; LT]
+         | "<="  -> [SWAP; LT; NOT]
+         | _     -> raise (Failure "unknown primitive 2"))
+    | Andalso(e1, e2) ->
+      let labend   = newLabel()
+      let labfalse = newLabel()
+      cExpr e1 varEnv funEnv
+      @ [IFZERO labfalse]
+      @ cExpr e2 varEnv funEnv
+      @ [GOTO labend; Label labfalse; CSTI 0; Label labend]            
+    | Orelse(e1, e2) -> 
+      let labend  = newLabel()
+      let labtrue = newLabel()
+      cExpr e1 varEnv funEnv
+      @ [IFNZRO labtrue]
+      @ cExpr e2 varEnv funEnv
+      @ [GOTO labend; Label labtrue; CSTI 1; Label labend]
+    | Call(f, es) -> callfun f es varEnv funEnv
+    | PreInc acc -> 
+      cAccess acc varEnv funEnv @ [DUP; LDI; CSTI 1; ADD; STI]
+    | PreDec acc -> 
+      cAccess acc varEnv funEnv @ [DUP; LDI; CSTI 1; SUB; STI]
+    | Ternary (e1, e2, e3) -> 
+      let labtrue = newLabel()
+      let labend  = newLabel()
+      cExpr e1 varEnv funEnv
+      @ [IFNZRO labtrue]
+      @ cExpr e3 varEnv funEnv
+      @ [GOTO labend; Label labtrue]
+      @ cExpr e2 varEnv funEnv
+      @ [Label labend]
+```
+
+The test
+```fsharp
+void main(int n ){
+    int y;
+    y = n > 0 ? 10 : 20;
+    print y;
+}
+```
+Output of test
+```fsharp
+> compileToFile (fromFile "Ternarytest.c") "Ternarytest.out";;
+val it : Machine.instr list =
+  [LDARGS; CALL (1, "L1"); STOP; Label "L1"; INCSP 1; GETBP; CSTI 1; ADD;
+   GETBP; CSTI 0; ADD; LDI; CSTI 0; SWAP; LT; IFNZRO "L2"; CSTI 20; GOTO "L3";
+   Label "L2"; CSTI 10; Label "L3"; STI; INCSP -1; GETBP; CSTI 1; ADD; LDI;
+   PRINTI; INCSP -1; INCSP -1; RET 0]
+
+```
 
 
 # 8.6
+Didn't get it to work completely. But this is what we got so far.
+We would appreciate a walk through on this in the general feedback.
+
+CPar.fsy
+```fsharp
+%token CASE
+
+StmtM:  /* No unbalanced if-else */
+    Expr SEMI                           { Expr($1)             }
+  | RETURN SEMI                         { Return None          }
+  | RETURN Expr SEMI                    { Return(Some($2))     }
+  | Block                               { $1                   }
+  | IF LPAR Expr RPAR StmtM ELSE StmtM  { If($3, $5, $7)       } 
+  | WHILE LPAR Expr RPAR StmtM          { While($3, $5)        }
+  | SWITCH LPAR Expr RPAR LBRACE Case RBRACE { Switch($3, $6) }
+;
+
+Case:
+     CASE CSTINT COLON Case               { Block [Stmt(Expr($2); Stmt($4))]           }
+  |  CASE CSTINT COLON Case        { Block [Stmt(Expr($2); Stmt($4))] :: $5     }
+;
+```
+Absyn
+```fsharp
+and stmt =                                                         
+  | If of expr * stmt * stmt         (* Conditional                 *)
+  | While of expr * stmt             (* While loop                  *)
+  | Expr of expr                     (* Expression statement   e;   *)
+  | Return of expr option            (* Return from method          *)
+  | Block of stmtordec list          (* Block: grouping and scope   *)
+  | Switch of expr * stmtordec list  (* Switch case *)
+
+```
+Comp.fs
+```fsharp
+let rec cStmt stmt (varEnv : varEnv) (funEnv : funEnv) : instr list = 
+    match stmt with
+    | If(e, stmt1, stmt2) -> 
+      let labelse = newLabel()
+      let labend  = newLabel()
+      cExpr e varEnv funEnv @ [IFZERO labelse] 
+      @ cStmt stmt1 varEnv funEnv @ [GOTO labend]
+      @ [Label labelse] @ cStmt stmt2 varEnv funEnv
+      @ [Label labend]           
+    | While(e, body) ->
+      let labbegin = newLabel()
+      let labtest  = newLabel()
+      [GOTO labtest; Label labbegin] @ cStmt body varEnv funEnv
+      @ [Label labtest] @ cExpr e varEnv funEnv @ [IFNZRO labbegin]
+    | Expr e -> 
+      cExpr e varEnv funEnv @ [INCSP -1]  (* Remove result of expression from stack, as this is a statement *)
+    | Block stmts -> 
+      let rec loop stmts varEnv =
+          match stmts with 
+          | []     -> (snd varEnv, [])
+          | s1::sr -> 
+            let (varEnv1, code1) = cStmtOrDec s1 varEnv funEnv
+            let (fdepthr, coder) = loop sr varEnv1 
+            (fdepthr, code1 @ coder)
+      let (fdepthend, code) = loop stmts varEnv
+      code @ [INCSP(snd varEnv - fdepthend)]  (* Remove variables, declared in the block, from the stack *)
+    | Return None -> 
+      [RET (snd varEnv - 1)]
+    | Return (Some e) -> 
+      cExpr e varEnv funEnv @ [RET (snd varEnv)]
+    | Switch (e1, stmt2) ->
+      let labrador = newLabel()
+      let labotomy = newLabel()
+      let rec loop stmt2 varEnv =
+        match stmt2 with 
+        | []     -> (snd varEnv, [])
+        | s1::sr -> 
+          let (varEnv1, code1) = cStmtOrDec s1 varEnv funEnv 
+          let (fdepthr, coder) = loop sr varEnv1 
+          (fdepthr, [IFNZRO labotomy] @ code1 @ coder)
+      let labusalt = loop stmt2 varEnv
+      cExpr e1 varEnv funEnv
+      @ [IFNZRO labrador]
+      @ [INCSP(snd varEnv - fst labusalt)]
+
+```

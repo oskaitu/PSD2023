@@ -14,7 +14,7 @@ let nl = CstI 10
 %token <int> CSTINT CSTBOOL
 %token <string> CSTSTRING NAME
 
-%token CHAR ELSE IF TERNARY COLON INT NULL PRINT PRINTLN RETURN VOID WHILE FOR
+%token CHAR ELSE SWITCH IF TERNARY COLON INT NULL PRINT PRINTLN RETURN VOID WHILE FOR CASE
 %token PLUS PREINC MINUS PREDEC TIMES DIV MOD 
 %token EQ NE GT LT GE LE
 %token NOT SEQOR SEQAND
@@ -25,7 +25,7 @@ let nl = CstI 10
 %nonassoc PRINT
 %left SEQOR 
 %left SEQAND
-%left EQ NE TERNARY COLON
+%left EQ NE TERNARY COLON 
 %left GT LT GE LE
 %left PLUS PREINC MINUS PREDEC
 %left TIMES DIV MOD 
@@ -101,6 +101,12 @@ StmtM:  /* No unbalanced if-else */
   | Block                               { $1                   }
   | IF LPAR Expr RPAR StmtM ELSE StmtM  { If($3, $5, $7)       } 
   | WHILE LPAR Expr RPAR StmtM          { While($3, $5)        }
+  | SWITCH LPAR Expr RPAR LBRACE Case RBRACE { Switch($3, $6) }
+;
+
+Case:
+     CASE CSTINT COLON Case               { Block [Stmt(Expr($2); Stmt($4))]           }
+  |  CASE CSTINT COLON Case        { Block [Stmt(Expr($2); Stmt($4))] :: $5     }
 ;
 
 StmtU:
@@ -109,6 +115,8 @@ StmtU:
   | WHILE LPAR Expr RPAR StmtU          { While($3, $5)        }
   | FOR LPAR Expr SEMI Expr SEMI Expr RPAR Stmt { Block [Stmt(Expr($3));Stmt(While($5, Block[Stmt($9);Stmt(Expr($7))]))]}
 ;
+
+
 
 Expr: 
     Access                              { Access $1           }
