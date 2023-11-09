@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assignment 1", "Assignment 1", "{4E7F59FD-6291-48BA-A97F-E9C0DF03E4E3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "csharp", "Assignment 1\csharp\csharp.csproj", "{D7B5AD4B-D598-43A1-9BA7-D397D29ABCCE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D7B5AD4B-D598-43A1-9BA7-D397D29ABCCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7B5AD4B-D598-43A1-9BA7-D397D29ABCCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7B5AD4B-D598-43A1-9BA7-D397D29ABCCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7B5AD4B-D598-43A1-9BA7-D397D29ABCCE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D7B5AD4B-D598-43A1-9BA7-D397D29ABCCE} = {4E7F59FD-6291-48BA-A97F-E9C0DF03E4E3}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {600E1C0A-0092-47FF-8C86-E3BBF6643153}
+	EndGlobalSection
+EndGlobal
