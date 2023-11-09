@@ -5,41 +5,41 @@ default void SelectionSort (int32[] arr)  cil managed
     .maxstack 4                
                             
     .locals init (
-        int32    V_0,
-        int32    V_1,
-        int32    V_2,
+        int32    V_0, // args
+        int32    V_1, // least
+        int32    V_2, //
         int32    V_3)
-    IL_0000:  ldc.i4.0             
-    IL_0001:  stloc.0             
-    IL_0002:  br.s IL_0032        
+    IL_0000:  ldc.i4.0 
+    IL_0001:  stloc.0 // this saves 0 unto i
+    IL_0002:  br.s IL_0032  // this is the logic for terminating the loop
 
-    IL_0004:  ldloc.0             
-    IL_0005:  stloc.1             
-    IL_0006:  ldloc.0             
-    IL_0007:  ldc.i4.1             
-    IL_0008:  add                 
-    IL_0009:  stloc.3             
+    IL_0004:  ldloc.0 
+    IL_0005:  stloc.1 // least = i
+    IL_0006:  ldloc.0 
+    IL_0007:  ldc.i4.1
+    IL_0008:  add 
+    IL_0009:  stloc.3 // set j = i + 1     
     IL_000a:  br.s IL_001a        
 
-    IL_000c:  ldarg.0             
-    IL_000d:  ldloc.3             
-    IL_000e:  ldelem.i4         
-    IL_000f:  ldarg.0             
-    IL_0010:  ldloc.1             
-    IL_0011:  ldelem.i4         
-    IL_0012:  bge.s IL_0016        
+    IL_000c:  ldarg.0 // loads the array      
+    IL_000d:  ldloc.3 // get j
+    IL_000e:  ldelem.i4 // get index of j from array  
+    IL_000f:  ldarg.0  // get array again
+    IL_0010:  ldloc.1 // get least
+    IL_0011:  ldelem.i4 // get index of least from arr
+    IL_0012:  bge.s IL_0016 // jump
 
     IL_0014:  ldloc.3             
     IL_0015:  stloc.1             
-    IL_0016:  ldloc.3             
+    IL_0016:  ldloc.3  //           
     IL_0017:  ldc.i4.1             
     IL_0018:  add                 
     IL_0019:  stloc.3             
-    IL_001a:  ldloc.3             
-    IL_001b:  ldarg.0             
-    IL_001c:  ldlen             
-    IL_001d:  conv.i4             
-    IL_001e:  blt.s IL_000c        
+    IL_001a:  ldloc.3 // loads j unto the stack         
+    IL_001b:  ldarg.0 // load the first argument (int[] arr)
+    IL_001c:  ldlen // save the length of the arr on the stack
+    IL_001d:  conv.i4 // bs
+    IL_001e:  blt.s IL_000c // jumps 
 
     IL_0020:  ldarg.0             
     IL_0021:  ldloc.0             
@@ -59,11 +59,11 @@ default void SelectionSort (int32[] arr)  cil managed
     IL_002f:  ldc.i4.1             
     IL_0030:  add                 
     IL_0031:  stloc.0             
-    IL_0032:  ldloc.0             
+    IL_0032:  ldloc.0 // This loads the value of i and 
     IL_0033:  ldarg.0             
     IL_0034:  ldlen             
     IL_0035:  conv.i4             
-    IL_0036:  blt.s IL_0004        
+    IL_0036:  blt.s IL_0004 // checks whether i is less than args otherwise it returns.
 
     IL_0038:  ret                 
     } 
