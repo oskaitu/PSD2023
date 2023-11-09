@@ -1,6 +1,5 @@
-![Alt text](image.png)
-![Alt text](image-1.png)
+# 9.1 
+see 9.1 bytecode 
 
-
-![Alt text](image-2.png)
-![Alt text](image-3.png)
+# 9.2 
+![Alt text](9.2.png)
