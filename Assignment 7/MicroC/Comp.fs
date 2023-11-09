@@ -32,6 +32,7 @@
 
 module Comp
 
+
 open System.IO
 open Absyn
 open Machine
@@ -144,6 +145,22 @@ let rec cStmt stmt (varEnv : varEnv) (funEnv : funEnv) : instr list =
       [RET (snd varEnv - 1)]
     | Return (Some e) -> 
       cExpr e varEnv funEnv @ [RET (snd varEnv)]
+    | Switch (e1, stmt2) ->
+      let labrador = newLabel()
+      let labotomy = newLabel()
+      let rec loop stmt2 varEnv =
+        match stmt2 with 
+        | []     -> (snd varEnv, [])
+        | s1::sr -> 
+          let (varEnv1, code1) = cStmtOrDec s1 varEnv funEnv 
+          let (fdepthr, coder) = loop sr varEnv1 
+          (fdepthr, [IFNZRO labotomy] @ code1 @ coder)
+      let labusalt = loop stmt2 varEnv
+      cExpr e1 varEnv funEnv
+      @ [IFNZRO labrador]
+      @ [INCSP(snd varEnv - fst labusalt)]
+
+      
 
 and cStmtOrDec stmtOrDec (varEnv : varEnv) (funEnv : funEnv) : varEnv * instr list = 
     match stmtOrDec with 
@@ -206,6 +223,19 @@ and cExpr (e : expr) (varEnv : varEnv) (funEnv : funEnv) : instr list =
       @ cExpr e2 varEnv funEnv
       @ [GOTO labend; Label labtrue; CSTI 1; Label labend]
     | Call(f, es) -> callfun f es varEnv funEnv
+    | PreInc acc -> 
+      cAccess acc varEnv funEnv @ [DUP; LDI; CSTI 1; ADD; STI]
+    | PreDec acc -> 
+      cAccess acc varEnv funEnv @ [DUP; LDI; CSTI 1; SUB; STI]
+    | Ternary (e1, e2, e3) -> 
+      let labtrue = newLabel()
+      let labend  = newLabel()
+      cExpr e1 varEnv funEnv
+      @ [IFNZRO labtrue]
+      @ cExpr e3 varEnv funEnv
+      @ [GOTO labend; Label labtrue]
+      @ cExpr e2 varEnv funEnv
+      @ [Label labend]
     
 
 (* Generate code to access variable, dereference pointer or index array.
